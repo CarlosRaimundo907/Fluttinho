@@ -1,0 +1,159 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "date": "2025-08-25 12:34:12",
+      "ownerId": 1,
+      "name": "Pedra inútil",
+      "description": "Achada no quintal e pesa uns 300 gramas. Não serve, nem para escorar a porta.",
+      "location": "Deixada no quintal mesmo",
+      "photoURL": "https://picsum.photos/400",
+      "status": "ON"
+    },
+    {
+      "id": 2,
+      "date": "2025-08-25 14:10:05",
+      "ownerId": 2,
+      "name": "Patinho de borracha que faz barulho",
+      "description": "Resgatado de uma banheira. Se apertar, ele grita. Perfeito para espantar a solidão.",
+      "location": "No parapeito da janela do banheiro",
+      "photoURL": "https://picsum.photos/400?random=2",
+      "status": "ON"
+    },
+    {
+      "id": 3,
+      "date": "2025-08-26 09:22:45",
+      "ownerId": 1,
+      "name": "Meia perdida",
+      "description": "A irmã gêmea se perdeu na máquina de lavar. Esta tem esperança de reencontrá-la.",
+      "location": "Gaveta de meias ímpares",
+      "photoURL": "https://picsum.photos/400?random=3",
+      "status": "ON"
+    },
+    {
+      "id": 4,
+      "date": "2025-08-26 15:55:30",
+      "ownerId": 2,
+      "name": "Chapéu de sol para gato",
+      "description": "Comprado com a melhor das intenções, mas o gato se recusou a usar. Sem arranhões.",
+      "location": "Em cima da geladeira",
+      "photoURL": "https://picsum.photos/400?random=4",
+      "status": "ON"
+    },
+    {
+      "id": 5,
+      "date": "2025-08-27 10:01:00",
+      "ownerId": 1,
+      "name": "Caneta que só falha",
+      "description": "Escreve por um segundo e depois falha. Ideal para quem quer um desafio ou gosta de arte abstrata.",
+      "location": "No pote de canetas sem tampa",
+      "photoURL": "https://picsum.photos/400?random=5",
+      "status": "OFF"
+    },
+    {
+      "id": 6,
+      "date": "2025-08-27 18:40:50",
+      "ownerId": 2,
+      "name": "Copo com a estampa de um elefante sorrindo",
+      "description": "Companheiro de café da manhã. A estampa é um pouco desbotada, mas o elefante ainda sorri.",
+      "location": "Prateleira da cozinha",
+      "photoURL": "https://picsum.photos/400?random=6",
+      "status": "ON"
+    },
+    {
+      "id": 7,
+      "date": "2025-08-28 07:15:20",
+      "ownerId": 1,
+      "name": "Miniatura de dinossauro de plástico",
+      "description": "Um T-Rex de plástico verde. Perdeu um braço em uma batalha épica com um Lego. Ainda é feroz.",
+      "location": "No escritório, ao lado do monitor",
+      "photoURL": "https://picsum.photos/400?random=7",
+      "status": "OFF"
+    },
+    {
+      "id": 8,
+      "date": "2025-08-28 11:59:00",
+      "ownerId": 2,
+      "name": "Pilhas sem carga",
+      "description": "Deixadas em uma gaveta 'para testar depois'. É a prova de que a esperança é a última que morre.",
+      "location": "Gaveta de bagunças",
+      "photoURL": "https://picsum.photos/400?random=8",
+      "status": "OFF"
+    },
+    {
+      "id": 9,
+      "date": "2025-08-29 09:30:10",
+      "ownerId": 1,
+      "name": "Borracha que borra tudo",
+      "description": "A borracha tem apenas uma função e falha miseravelmente nela. Deixa rastros de grafite por onde passa.",
+      "location": "Estojo de lápis no chão",
+      "photoURL": "https://picsum.photos/400?random=9",
+      "status": "ON"
+    },
+    {
+      "id": 10,
+      "date": "2025-08-29 16:21:40",
+      "ownerId": 2,
+      "name": "Chaveiro com barulho de campainha de bicicleta",
+      "description": "Faz 'ding-ding' toda vez que você se mexe. Ideal para quem quer que todos saibam onde está.",
+      "location": "Prendido na mochila",
+      "photoURL": "https://picsum.photos/400?random=10",
+      "status": "ON"
+    },
+    {
+      "id": 11,
+      "date": "2025-08-30 08:05:55",
+      "ownerId": 1,
+      "name": "Um pedaço de barbante",
+      "description": "Você nunca sabe quando vai precisar de um pedaço de barbante. Este é aquele que estava guardado 'para um dia'.",
+      "location": "Dentro de uma caixa de sapatos",
+      "photoURL": "https://picsum.photos/400?random=11",
+      "status": "ON"
+    },
+    {
+      "id": 12,
+      "date": "2025-08-30 19:15:30",
+      "ownerId": 2,
+      "name": "Relógio de parede sem pilhas",
+      "description": "Mostra a hora certa duas vezes por dia. Uma forma de filosofia sobre o tempo.",
+      "location": "Na parede da sala, parado",
+      "photoURL": "https://picsum.photos/400?random=12",
+      "status": "OFF"
+    },
+    {
+      "date": "2025-08-29 14:27:56",
+      "ownerId": 2,
+      "name": "Peteca Velha",
+      "description": "Fedorenta, sem penas e sem cortiça.",
+      "location": "No quintal, no meio do matinho.",
+      "photoURL": "https://picsum.photos/400?random=83",
+      "status": "ON",
+      "id": 13
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "createdAt": "2025-05-10 20:22:45",
+      "name": "Joca da Silva",
+      "email": "joca@email.com",
+      "password": "Senha@123",
+      "birth": "2000-10-18",
+      "photo": "https://randomuser.me/api/portraits/lego/5.jpg",
+      "admin": true,
+      "status": "ON"
+    },
+    {
+      "id": 2,
+      "createdAt": "2025-05-14 18:32:24",
+      "name": "Marineuza Siriliano",
+      "email": "marineuza@email.com",
+      "password": "Senha@123",
+      "birth": "1984-01-05",
+      "photo": "https://randomuser.me/api/portraits/women/68.jpg",
+      "admin": false,
+      "status": "ON"
+    }
+  ],
+  "contacts": []
+}
