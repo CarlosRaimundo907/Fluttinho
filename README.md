@@ -1,6 +1,6 @@
 # Fluttinho
 
-`By Luferat. Atualizado em 29/08/2025`
+`By Luferat: atualizado em 29/08/2025`
 
 Aplicativo experimental com Flutter. Um CRUD simples usando uma API REST.
 
