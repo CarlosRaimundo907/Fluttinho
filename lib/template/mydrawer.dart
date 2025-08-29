@@ -10,7 +10,7 @@ class MyDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     // Variável para simular o status de login.
     // Em uma aplicação real, você usaria o estado de um Provider, Bloc, etc.
-    final bool isLoggedIn = true; // Altere para 'false' para testar o Caso 1
+    final bool isLoggedIn = false; // Altere para 'false' para testar o Caso 1
 
     return Drawer(
       child: Column(
@@ -107,7 +107,7 @@ Widget _buildLoggedOutHeader(BuildContext context) {
           CircleAvatar(radius: 30, child: Icon(Icons.person, size: 40)),
           SizedBox(width: 16),
           Text(
-            'Google Login',
+            'Login / Entrar',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
           ),
         ],
