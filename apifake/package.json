@@ -1,14 +1,13 @@
 {
   "name": "apifake",
   "version": "1.0.0",
-  "description": "API Fake para Fluttinho",
-  "license": "MIT",
-  "author": "André Luferat",
-  "type": "commonjs",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
     "json-server": "^0.17.4"
   }

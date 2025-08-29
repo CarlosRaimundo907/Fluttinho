@@ -13,6 +13,9 @@ Aplicativo experimental com Flutter. Um CRUD simples usando uma API REST.
    - Abra um terminal e comande `flutter pub get`
  
 Se precisar usar a **API Fake** embitida, siga os passos: 
+
+> Para que a API Fake funcione é necessário ter o Node.js atualizado no sistema.
+
  - Abra um terminal e acesse o diretório da API comandando `cd apifake`
  - Baixe as dependências comandando `npm install`
  - Rode a API comandando `npx json-server db.json -p 8080`

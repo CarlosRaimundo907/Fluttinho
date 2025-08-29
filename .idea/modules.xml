@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/fluttinho.iml" filepath="$PROJECT_DIR$/fluttinho.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/fluttinho_android.iml" filepath="$PROJECT_DIR$/android/fluttinho_android.iml" />
     </modules>
   </component>
 </project>
