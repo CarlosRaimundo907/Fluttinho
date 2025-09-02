@@ -11,6 +11,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import '../pages/contacts_page.dart';
 import '../pages/edit_page.dart';
 import '../pages/home_page.dart';
+import '../pages/login_page.dart';
 import '../pages/new_page.dart';
 import '../pages/view_page.dart';
 import 'config.dart';
@@ -56,6 +57,7 @@ class MyApp extends StatelessWidget {
         '/view': (context) => const ViewPage(),
         '/edit': (context) => const EditPage(),
         '/new': (context) => const NewPage(),
+        '/login': (context) => LoginPage(),
       },
     );
   }

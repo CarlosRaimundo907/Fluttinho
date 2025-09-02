@@ -1,0 +1,26 @@
+{
+  "dependencies": {
+    "firebase-tools": "^14.15.1"
+  },
+  "name": "fluttinho",
+  "version": "1.0.0",
+  "description": "`By Luferat: atualizado em 29/08/2025`",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Luferat/Fluttinho.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Luferat/Fluttinho/issues"
+  },
+  "homepage": "https://github.com/Luferat/Fluttinho#readme"
+}
