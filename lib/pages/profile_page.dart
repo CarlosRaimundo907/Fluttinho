@@ -10,11 +10,8 @@ import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../template/config.dart';
 import '../template/myappbar.dart';
-import '../template/myfooter.dart';
 import '../template/mydrawer.dart';
-import '../template/apptools.dart';
 
 // Instância privada do Dio
 final Dio _dio = Dio();
@@ -92,7 +89,6 @@ class _ProfilePage extends State<ProfilePage> {
               padding: const EdgeInsets.all(32.0),
               child: content,
             ),
-            bottomNavigationBar: const MyBottomNavBar(),
           );
         }
       },

@@ -9,7 +9,6 @@ import 'package:intl/intl.dart'; // Adicionado para formatação de data
 
 import '../template/config.dart';
 import '../template/myappbar.dart';
-import '../template/myfooter.dart';
 import '../template/mydrawer.dart';
 import '../template/apptools.dart';
 
@@ -70,7 +69,6 @@ class _ContactsPage extends State<ContactsPage> {
               padding: const EdgeInsets.all(32.0),
               child: _buildContactForm(),
             ),
-            bottomNavigationBar: const MyBottomNavBar(),
           );
         }
       },

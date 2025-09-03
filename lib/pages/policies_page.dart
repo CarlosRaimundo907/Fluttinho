@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
 import '../template/myappbar.dart';
-import '../template/myfooter.dart';
 import '../template/mydrawer.dart';
 
 // Instância privada (private) do Dio
@@ -51,7 +50,6 @@ class _PoliciesPage extends State<PoliciesPage> {
               padding: const EdgeInsets.all(32.0),
               child: _pageContent(),
             ),
-            bottomNavigationBar: const MyBottomNavBar(),
           );
         }
       },
