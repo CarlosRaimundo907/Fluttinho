@@ -1,6 +1,7 @@
-// main.dart ou onde o seu MyDrawer estiver
-import 'package:flutter/material.dart';
+// template/mydrawer.dart
 
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'config.dart';
 
 class MyDrawer extends StatelessWidget {
@@ -8,33 +9,33 @@ class MyDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Variável para simular o status de login.
-    // Em uma aplicação real, você usaria o estado de um Provider, Bloc, etc.
-    final bool isLoggedIn = false; // Altere para 'false' para testar o Caso 1
-
     return Drawer(
       child: Column(
         children: [
-          // Conteúdo condicional do DrawerHeader
-          if (isLoggedIn)
-          // Caso 2: Usuário logado
-            _buildLoggedInHeader(context)
-          else
-          // Caso 1: Usuário não logado
-            _buildLoggedOutHeader(context),
+          // Use um StreamBuilder para ouvir as mudanças de autenticação
+          StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, snapshot) {
+              final user = snapshot.data; // O usuário logado ou null
+              if (user != null) {
+                // Caso 2: Usuário logado
+                return _buildLoggedInHeader(context, user);
+              } else {
+                // Caso 1: Usuário não logado
+                return _buildLoggedOutHeader(context);
+              }
+            },
+          ),
 
-          // ... (O restante do seu código do Drawer)
-          // Acesso à página inicial → '/'
+          // ... (O restante do seu código do Drawer permanece o mesmo)
           ListTile(
-            title: const Text('Inicio'),
+            title: const Text('Início'),
             leading: const Icon(Icons.home),
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, '/');
             },
           ),
-
-          // Novo item: "Novo Item"
           ListTile(
             title: const Text('Novo Item'),
             leading: const Icon(Icons.add_circle),
@@ -43,8 +44,6 @@ class MyDrawer extends StatelessWidget {
               Navigator.pushNamed(context, '/new');
             },
           ),
-
-          // ... (outros itens da lista)
           ListTile(
             title: const Text('Contatos'),
             leading: const Icon(Icons.contact_mail),
@@ -53,9 +52,7 @@ class MyDrawer extends StatelessWidget {
               Navigator.pushNamed(context, '/contacts');
             },
           ),
-
           const Divider(),
-
           ListTile(
             title: const Text('Privacidade'),
             leading: const Icon(Icons.lock),
@@ -64,7 +61,6 @@ class MyDrawer extends StatelessWidget {
               Navigator.pushNamed(context, '/policies');
             },
           ),
-
           ListTile(
             title: const Text('Informações'),
             leading: const Icon(Icons.info),
@@ -73,7 +69,6 @@ class MyDrawer extends StatelessWidget {
               Navigator.pushNamed(context, '/info');
             },
           ),
-
           Expanded(
             child: Align(
               alignment: Alignment.bottomCenter,
@@ -90,16 +85,61 @@ class MyDrawer extends StatelessWidget {
       ),
     );
   }
+
+  // A função agora recebe o objeto User
+  Widget _buildLoggedInHeader(BuildContext context, User user) {
+    return DrawerHeader(
+      child: InkWell(
+        onTap: () {
+          Navigator.pop(context);
+          Navigator.pushNamed(context, '/profile');
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 30,
+              // Use a photoURL do usuário
+              backgroundImage: user.photoURL != null
+                  ? NetworkImage(user.photoURL!)
+                  : null,
+              child: user.photoURL == null
+                  ? const Icon(Icons.person, size: 40)
+                  : null,
+            ),
+            const SizedBox(width: 16),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  // Use o displayName do usuário
+                  user.displayName ?? 'Usuário',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20.0,
+                  ),
+                ),
+                const Text(
+                  'Ver perfil',
+                  style: TextStyle(fontSize: 14.0, color: Colors.blue),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-// Funções para construir os diferentes cabeçalhos
+// As funções _buildLoggedOutHeader e o restante do código não mudaram.
 Widget _buildLoggedOutHeader(BuildContext context) {
   return DrawerHeader(
     child: InkWell(
-      // Permite que o header seja clicável
       onTap: () {
         Navigator.pop(context);
-        Navigator.pushNamed(context, '/login'); // Rota para a tela de login
+        Navigator.pushNamed(context, '/login');
       },
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -109,51 +149,6 @@ Widget _buildLoggedOutHeader(BuildContext context) {
           Text(
             'Login / Entrar',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-Widget _buildLoggedInHeader(BuildContext context) {
-  // Dados falsos de usuário para o exemplo
-  final String userName = 'Joca da Silva';
-  // Simule a imagem do usuário com um CircleAvatar com cor
-  final Widget userImage = const CircleAvatar(
-    radius: 30,
-    backgroundColor: Colors.blue,
-    child: Text('JS', style: TextStyle(color: Colors.white, fontSize: 24)),
-  );
-
-  return DrawerHeader(
-    child: InkWell(
-      // Permite que o header seja clicável
-      onTap: () {
-        Navigator.pop(context);
-        Navigator.pushNamed(context, '/profile'); // Rota para o perfil
-      },
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          userImage,
-          const SizedBox(width: 16),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                userName,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20.0,
-                ),
-              ),
-              const Text(
-                'Ver perfil',
-                style: TextStyle(fontSize: 14.0, color: Colors.blue),
-              ),
-            ],
           ),
         ],
       ),

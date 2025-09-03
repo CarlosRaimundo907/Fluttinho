@@ -1,20 +1,18 @@
 library;
 
-/// Página de contatos
-///     Exibe, processa e envia um formulário de contatos
+/// Página de login
+/// Exibe um botão para autenticação via Google.
 
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:intl/intl.dart'; // Adicionado para formatação de data
-
-import '../template/config.dart';
 import '../template/myappbar.dart';
-import '../template/myfooter.dart';
 import '../template/mydrawer.dart';
-import '../template/apptools.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-// Instância privada (private) do Dio
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
+
+// Instância privada do Dio
 final Dio _dio = Dio();
 
 // Nome da página (AppBar)
@@ -28,26 +26,38 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPage extends State<LoginPage> {
-  final GlobalKey<FormState> _contactsFormKey = GlobalKey<FormState>();
+  // Função para fazer login com o Google
+  Future<void> _signInWithGoogle() async {
+    try {
+      if (kIsWeb) {
+        final googleProvider = GoogleAuthProvider();
+        await FirebaseAuth.instance.signInWithPopup(googleProvider);
+      } else {
+        final googleProvider = GoogleAuthProvider();
+        await FirebaseAuth.instance.signInWithProvider(googleProvider);
+      }
 
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _subjectController = TextEditingController();
-  final TextEditingController _messageController = TextEditingController();
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _subjectController.dispose();
-    _messageController.dispose();
-    super.dispose();
+      // ✅ Redireciona para Home após login bem-sucedido
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed('/');
+      }
+    } on FirebaseAuthException catch (e) {
+      if (kDebugMode) {
+        print('Erro no Firebase Auth: ${e.message}');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro de login: $e');
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final content = _buildLoginPage();
+
         if (constraints.maxWidth > 1080) {
           return Row(
             children: [
@@ -57,7 +67,7 @@ class _LoginPage extends State<LoginPage> {
                   appBar: MyAppBar(title: pageName),
                   body: SingleChildScrollView(
                     padding: const EdgeInsets.all(32.0),
-                    child: _buildLoginPage(),
+                    child: content,
                   ),
                 ),
               ),
@@ -69,9 +79,8 @@ class _LoginPage extends State<LoginPage> {
             drawer: const MyDrawer(),
             body: SingleChildScrollView(
               padding: const EdgeInsets.all(32.0),
-              child: _buildLoginPage(),
+              child: content,
             ),
-            bottomNavigationBar: const MyBottomNavBar(),
           );
         }
       },
@@ -80,7 +89,37 @@ class _LoginPage extends State<LoginPage> {
 
   Widget _buildLoginPage() {
     return Center(
-      child: SizedBox(width: 540, child: Center(child: Text('Conteúdo viual da página aqui'))),
+      child: SizedBox(
+        width: 540,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Clique no botão abaixo para fazer login com sua conta do Google.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: _signInWithGoogle,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.login),
+                  SizedBox(width: 8),
+                  Text('Login com Google'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
