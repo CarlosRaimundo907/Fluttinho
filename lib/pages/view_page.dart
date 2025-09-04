@@ -20,8 +20,8 @@ var pageName = 'Item';
 
 // StatefulWidget para gerenciar o estado dos dados do item
 class ViewPage extends StatefulWidget {
-  // Construtor
-  const ViewPage({super.key});
+  final String? id;
+  const ViewPage({super.key, required this.id});
 
   @override
   // Cria o estado mutável para este widget
@@ -42,17 +42,26 @@ class _ViewPageState extends State<ViewPage> {
   String? _itemId;
 
   @override
+  void initState() {
+    super.initState();
+
+    // Se o ID estiver ausente, redireciona para a Home
+    if (widget.id == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/');
+      });
+    }
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Obtém o ID do item dos argumentos da rota
-    final itemId = ModalRoute.of(context)?.settings.arguments as String?;
+    // final itemId = ModalRoute.of(context)?.settings.arguments as String?;
 
     // Se o ID for nulo (porque a página foi recarregada),
     // redireciona para a home page
-    if (itemId == null) {
-      if (kDebugMode) {
-        print('ID nulo na rota. Redirecionando para a home page.');
-      }
+    if (widget.id == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacementNamed('/');
       });
@@ -60,14 +69,14 @@ class _ViewPageState extends State<ViewPage> {
     }
 
     if (_itemId == null) {
-      _itemId = itemId;
-      _fetchItem(itemId);
+      _itemId = widget.id;
+      _fetchItem(widget.id!);
     }
   }
 
   // Função assíncrona para buscar os dados do item da API
   void _fetchItem(String itemId) async {
-    final url = '${Config.endPoint['listOne']}$itemId';
+    final url = '${Config.endPoint['listOne']}$_itemId';
 
     if (kDebugMode) {
       print('Iniciando a requisição para $url...');

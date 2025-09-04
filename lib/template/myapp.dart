@@ -46,7 +46,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case '/contacts':
       return MaterialPageRoute(builder: (_) => const ContactsPage());
     case '/view':
-      return MaterialPageRoute(builder: (_) => const ViewPage());
+      final id = settings.arguments as String?;
+      return MaterialPageRoute(builder: (_) => ViewPage(id: id));
     case '/edit':
       return MaterialPageRoute(builder: (_) => const EditPage());
     case '/new':

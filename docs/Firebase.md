@@ -48,7 +48,7 @@ Da mesma forma, este aplicativo conecta nosso app Flutter na versão Web ao Fire
 - [ ] Ignore as instruções para adicionar o SDK, por enquanto, e clique em `[Avançar]`;
 - [ ] Finalmente, clique em `[Continuar no console]`;
 
-### Gerando um `firebase_options.dart`
+## Gerando um `firebase_options.dart`
 
 Toda a conexão entre o aplicativo Flutter e o aplicativo Firebase é feita a partir do arquivo `firebase_options.dart` que está no mesmo nível da sua lib `main` (`main.dart`).
 
