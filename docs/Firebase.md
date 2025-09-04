@@ -52,13 +52,50 @@ Da mesma forma, este aplicativo conecta nosso app Flutter na versão Web ao Fire
 
 Toda a conexão entre o aplicativo Flutter e o aplicativo Firebase é feita a partir do arquivo `firebase_options.dart` que está no mesmo nível da sua lib `main` (`main.dart`).
 
-Para gerar este arquivo novamente com as suas próprias credenciais Firebase, siga os passos:
+Para gerar este arquivo novamente com as suas próprias credenciais Firebase, faça o seguinte:
 
-> _Caso o aplicativo Flutter esteja rodando, encerre-o!_
+Caso o aplicativo Flutter esteja rodando, encerre-o! Também é necessário ter o **Node.js** instalado e atualizado no sistema.
 
-- [ ] Abra um "Command Prompt" do Windows ou no Android Studio;
-- [ ] Instale a CLI (Command Line Interface) do FlutterFire com o comando:
+Abra um **Command Prompt** do Windows e instale a CLI (_Command Line Interface_) do Firebase com o comando:
+```cmd
+npm install -g firebase-tools
+```
+
+Teste a instalação comandando:
+```cmd
+firebase --version
+```
+
+Se der erro como:
+```cmd
+'firebase' não é reconhecido como um comando interno
+ou externo, um programa operável ou um arquivo em lotes.
+```
+
+Adicione o caminho `%USERPROFILE%\AppData\Roaming\npm` ao `Path` nas variáveis de ambiente.
+Feche o prompt e abra novamente para que este leia as variáveis de ambiente.
+
+Instale também a CLI do FlutterFire com o comando:
 ```cmd
 dart pub global activate flutterfire_cli
 ```
-- [ ]
+
+Acesse a pasta do aplicativo pelo prompt ou então, reinicie o Android Studio e abra um terminal CMD por ele.
+
+Autentique-se no Firebase com o comando:
+```cmd
+firebase login
+```
+
+Configure o Firebase no app flutter com o comando:
+```cmd
+flutterfire configure
+```
+Esse comando vai:
+ - Listar seus projetos Firebase
+ - Permitir escolher os apps Android/Web registrados
+ - Gerar o arquivo `lib/firebase_options.dart`
+
+Reinicie o aplicativo Flutter, verificando o log em busca de mensagens de erro...
+
+_EOF_
