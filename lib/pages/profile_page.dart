@@ -1,20 +1,15 @@
 library;
 
-import 'package:flutter/foundation.dart';
 /// Página de perfil
 /// Exibe os dados do usuário logado e botões para logout e perfil do Google
 
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../template/myappbar.dart';
 import '../template/mydrawer.dart';
-
-// Instância privada do Dio
-final Dio _dio = Dio();
 
 // Nome da página (AppBar)
 final pageName = 'Seu Perfil';
@@ -55,7 +50,9 @@ class _ProfilePage extends State<ProfilePage> {
     final url = Uri.parse('https://myaccount.google.com/');
     if (!await launchUrl(url, webOnlyWindowName: '_blank')) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Não foi possível abrir o perfil do Google')),
+        const SnackBar(
+          content: Text('Não foi possível abrir o perfil do Google'),
+        ),
       );
     }
   }

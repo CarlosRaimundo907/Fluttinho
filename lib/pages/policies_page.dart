@@ -4,13 +4,8 @@ library;
 ///     Mostra as Políticas de Privacidade do App
 
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-
 import '../template/myappbar.dart';
 import '../template/mydrawer.dart';
-
-// Instância privada (private) do Dio
-final Dio _dio = Dio();
 
 // Nome da página (AppBar)
 final pageName = 'Sua Privacidade';

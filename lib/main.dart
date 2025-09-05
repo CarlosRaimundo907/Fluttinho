@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'template/myapp.dart';
 import 'firebase_options.dart';
@@ -15,7 +14,6 @@ class AuthWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Apenas retorna o MyApp com a rota inicial '/'
     return MyApp(initialRoute: '/');
   }
 }
