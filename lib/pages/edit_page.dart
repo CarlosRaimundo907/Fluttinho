@@ -1,3 +1,5 @@
+// pages/edit_page.dart
+
 library;
 
 /// Página de edição de um item
@@ -7,6 +9,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Importa o Firebase Auth
 
 import '../template/config.dart';
 import '../template/myappbar.dart';
@@ -21,7 +24,10 @@ var pageName = 'Editar Item';
 
 // StatefulWidget para gerenciar o estado da página de edição
 class EditPage extends StatefulWidget {
-  const EditPage({super.key});
+  // A página agora recebe o 'id' como argumento
+  final String? id;
+
+  const EditPage({super.key, this.id});
 
   @override
   State<EditPage> createState() => _EditPageState();
@@ -29,10 +35,8 @@ class EditPage extends StatefulWidget {
 
 // A classe de estado da EditPage
 class _EditPageState extends State<EditPage> {
-  // Chave global para o formulário
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  // Controladores para os campos de texto do formulário
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _photoUrlController = TextEditingController();
@@ -45,11 +49,13 @@ class _EditPageState extends State<EditPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final itemId = ModalRoute.of(context)?.settings.arguments as String?;
+
+    // O ID agora vem do construtor do widget
+    final itemId = widget.id;
 
     if (itemId == null) {
       if (kDebugMode) {
-        print('ID nulo na rota. Redirecionando para a home page.');
+        print('ID nulo. Redirecionando para a home.');
       }
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacementNamed('/');
@@ -66,16 +72,34 @@ class _EditPageState extends State<EditPage> {
   // Função para buscar os dados do item
   void _fetchItem(String itemId) async {
     final url = '${Config.endPoint['listOne']}$itemId';
+    final user = FirebaseAuth.instance.currentUser;
+
     try {
       final response = await _dio.get(url);
+
       if (response.statusCode == 200 &&
           response.data is List &&
           response.data.isNotEmpty) {
         final item = response.data[0];
+
+        // **Checagem de permissão**
+        if (user == null || user.uid != item['ownerId']) {
+          if (kDebugMode) {
+            print('Usuário não autorizado a editar este item.');
+          }
+          if (!mounted) return;
+          showSnackBar(
+            context,
+            'Você não tem permissão para editar este item.',
+            color: Colors.red,
+          );
+          Navigator.of(context).pushReplacementNamed('/');
+          return;
+        }
+
         setState(() {
           _item = item;
           _isLoading = false;
-          // Preenche os controladores com os dados do item
           _nameController.text = item['name'] ?? '';
           _descriptionController.text = item['description'] ?? '';
           _photoUrlController.text = item['photoURL'] ?? '';
@@ -85,9 +109,6 @@ class _EditPageState extends State<EditPage> {
         setState(() {
           _isLoading = false;
         });
-        if (kDebugMode) {
-          print('Falha ao carregar o item.');
-        }
         if (!mounted) return;
         showSnackBar(context, 'Item não encontrado.', color: Colors.red);
         Navigator.of(context).pushReplacementNamed('/');
@@ -96,9 +117,6 @@ class _EditPageState extends State<EditPage> {
       setState(() {
         _isLoading = false;
       });
-      if (kDebugMode) {
-        print('Erro de requisição: $e');
-      }
       if (!mounted) return;
       showSnackBar(
         context,
@@ -109,13 +127,12 @@ class _EditPageState extends State<EditPage> {
     }
   }
 
-  // Função para salvar as alterações do item
   void _saveItem() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    // Coleta os dados do formulário
+    // Apenas os campos que podem ser editados
     final updatedData = {
       'name': _nameController.text,
       'description': _descriptionController.text,
@@ -140,7 +157,6 @@ class _EditPageState extends State<EditPage> {
           'Item atualizado com sucesso!',
           color: Colors.green,
         );
-        // Retorna `true` para a página anterior para indicar sucesso
         Navigator.of(context).pop(true);
       } else {
         showSnackBar(
@@ -162,7 +178,6 @@ class _EditPageState extends State<EditPage> {
     }
   }
 
-  // Função para mostrar a caixa de diálogo de confirmação e apagar o item
   void _deleteItem() async {
     final bool? confirmDelete = await showDialog<bool>(
       context: context,
@@ -172,11 +187,11 @@ class _EditPageState extends State<EditPage> {
           content: Text('Tem certeza que deseja apagar ${_item['name']}?'),
           actions: <Widget>[
             TextButton(
-              onPressed: () => Navigator.of(context).pop(false), // Não apagar
+              onPressed: () => Navigator.of(context).pop(false),
               child: const Text('Cancelar'),
             ),
             TextButton(
-              onPressed: () => Navigator.of(context).pop(true), // Apagar
+              onPressed: () => Navigator.of(context).pop(true),
               style: TextButton.styleFrom(foregroundColor: Colors.red),
               child: const Text('Apagar'),
             ),
@@ -185,7 +200,6 @@ class _EditPageState extends State<EditPage> {
       },
     );
 
-    // Se a confirmação for true, envia a requisição para a API
     if (confirmDelete == true) {
       final url = '${Config.endPoint['update']}$_itemId';
       try {
@@ -203,7 +217,6 @@ class _EditPageState extends State<EditPage> {
             'Item apagado com sucesso!',
             color: Colors.green,
           );
-          // Redireciona para a home page
           Navigator.of(context).pushReplacementNamed('/');
         } else {
           showSnackBar(
@@ -228,7 +241,6 @@ class _EditPageState extends State<EditPage> {
 
   @override
   void dispose() {
-    // Libera os controladores
     _nameController.dispose();
     _descriptionController.dispose();
     _photoUrlController.dispose();
@@ -347,8 +359,7 @@ class _EditPageState extends State<EditPage> {
                     foregroundColor: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 20.0), // Espaçamento entre os botões
-                // Botão "Apagar" agora com funcionalidade
+                const SizedBox(height: 20.0),
                 ElevatedButton.icon(
                   onPressed: _deleteItem,
                   icon: const Icon(Icons.delete_forever),

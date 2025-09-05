@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:fluttinho/pages/policies_page.dart';
@@ -15,27 +14,6 @@ import '../pages/view_page.dart';
 import 'config.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
-  final user = FirebaseAuth.instance.currentUser;
-
-  // 🔓 Rotas livres (acessíveis com ou sem login)
-  const freeRoutes = ['/', '/contacts', '/view', '/info', '/policies'];
-
-  // 🔒 Rotas privadas (exigem login)
-  const privateRoutes = ['/profile', '/edit', '/new'];
-
-  // 🚫 Rotas públicas (só acessíveis se estiver deslogado)
-  const publicRoutes = ['/login'];
-
-  // Redireciona se necessário
-  if (publicRoutes.contains(settings.name) && user != null) {
-    return MaterialPageRoute(builder: (_) => const HomePage());
-  }
-
-  if (privateRoutes.contains(settings.name) && user == null) {
-    return MaterialPageRoute(builder: (_) => const LoginPage());
-  }
-
-  // Roteamento normal
   switch (settings.name) {
     case '/':
       return MaterialPageRoute(builder: (_) => const HomePage());
@@ -49,7 +27,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       final id = settings.arguments as String?;
       return MaterialPageRoute(builder: (_) => ViewPage(id: id));
     case '/edit':
-      return MaterialPageRoute(builder: (_) => const EditPage());
+      final id = settings.arguments as String?;
+      return MaterialPageRoute(builder: (_) => EditPage(id: id));
     case '/new':
       return MaterialPageRoute(builder: (_) => const NewPage());
     case '/info':

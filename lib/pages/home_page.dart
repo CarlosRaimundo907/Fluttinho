@@ -1,5 +1,6 @@
 library;
 
+import 'package:firebase_auth/firebase_auth.dart';
 /// Página inicial do aplicativo
 ///     Obtém, processa e exibe a lista de itens da API
 
@@ -28,51 +29,35 @@ class HomePage extends StatefulWidget {
 
 // A classe de estado da HomePage
 class _HomePageState extends State<HomePage> {
-  // Lista para armazenar os itens da API
   List<dynamic> _items = [];
-
-  // Variável para controlar o estado de carregamento
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    // Chama a função para buscar os itens da API assim que o widget é criado
     _fetchItems();
   }
 
-  // Função assíncrona para buscar os itens da API
   void _fetchItems() async {
-    // Usamos o endpoint 'listAll' do arquivo config.dart, que já tem os filtros
     final url = Config.endPoint['listAll'];
-
     try {
-      // Faz a requisição GET para o endpoint da API
       final response = await _dio.get(url);
-
-      // Verifica se a resposta foi bem-sucedida (status code 200)
       if (response.statusCode == 200) {
-        // Converte a resposta em uma lista de objetos
         final List<dynamic> allItems = response.data;
-
-        // Atualiza o estado com a lista filtrada e ordenada (agora que o backend faz o trabalho)
         setState(() {
           _items = allItems;
-          _isLoading = false; // Define o carregamento como concluído
+          _isLoading = false;
         });
       } else {
-        // Em caso de erro, define o carregamento como falso
         setState(() {
           _isLoading = false;
         });
       }
     } on DioException {
-      // Trata erros de requisição, como problemas de rede
       setState(() {
         _isLoading = false;
       });
     } catch (e) {
-      // Trata outros erros inesperados
       setState(() {
         _isLoading = false;
       });
@@ -81,51 +66,59 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // LayoutBuilder permite ajustar o conteúdo para resoluções diferentes
     return LayoutBuilder(
       builder: (context, constraints) {
+        // Wrapper para o FloatingActionButton para controlar sua visibilidade
+        Widget? floatingActionButton;
+
+        // Use um StreamBuilder para decidir se o FAB deve ser exibido
+        floatingActionButton = StreamBuilder<User?>(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapshot) {
+            final user = snapshot.data;
+            if (user != null) {
+              // Se o usuário estiver logado, exibe o FAB
+              return FloatingActionButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed('/new');
+                },
+                child: const Icon(Icons.add),
+              );
+            } else {
+              // Se não estiver logado, retorna null para não exibir o FAB
+              return const SizedBox.shrink();
+            }
+          },
+        );
+
         // Se a largura é de 1080+
         if (constraints.maxWidth > 1080) {
-          // Versão para desktop
           return Row(
             children: [
-              const MyDrawer(), // O menu lateral fixo
+              const MyDrawer(),
               Expanded(
-                // Usei um Scaffold aninhado para ter uma AppBar na página
                 child: Scaffold(
                   appBar: MyAppBar(title: pageName),
-                  // O conteúdo principal da página
                   body: Center(
                     child: _isLoading
-                        ? const CircularProgressIndicator() // Exibe um indicador de carregamento
+                        ? const CircularProgressIndicator()
                         : PageContent(items: _items, isDesktop: true),
                   ),
-                  floatingActionButton: FloatingActionButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed('/new');
-                    },
-                    child: const Icon(Icons.add),
-                  ),
+                  floatingActionButton: floatingActionButton,
                 ),
               ),
             ],
           );
         } else {
-          // Versão para mobile/tablet
           return Scaffold(
             appBar: MyAppBar(title: pageName),
-            drawer: const MyDrawer(), // O menu deslizante
+            drawer: const MyDrawer(),
             body: Center(
               child: _isLoading
-                  ? const CircularProgressIndicator() // Exibe um indicador de carregamento
+                  ? const CircularProgressIndicator()
                   : PageContent(items: _items),
             ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed('/new');
-              },
-              child: const Icon(Icons.add),
-            ),
+            floatingActionButton: floatingActionButton,
           );
         }
       },

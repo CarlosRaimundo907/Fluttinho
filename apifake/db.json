@@ -139,30 +139,28 @@
       "photoURL": "https://picsum.photos/400?random=48",
       "status": "ON",
       "id": 14
+    },
+    {
+      "date": "2025-09-05 19:48:08",
+      "ownerId": "7GW65Xy6ObUMid5ezyKMpzRFSQz1",
+      "name": "Coisinhas",
+      "description": "Um monte de coisas inúteis e sem sentido.",
+      "location": "Caixa de sapatos velha e mofada.",
+      "photoURL": "https://picsum.photos/400?random=87",
+      "status": "ON",
+      "id": 15
     }
   ],
   "users": [
     {
-      "id": 1,
-      "createdAt": "2025-05-10 20:22:45",
-      "name": "Joca da Silva",
-      "email": "joca@email.com",
-      "password": "Senha@123",
-      "birth": "2000-10-18",
-      "photo": "https://randomuser.me/api/portraits/lego/5.jpg",
-      "admin": true,
-      "status": "ON"
-    },
-    {
-      "id": 2,
-      "createdAt": "2025-05-14 18:32:24",
-      "name": "Marineuza Siriliano",
-      "email": "marineuza@email.com",
-      "password": "Senha@123",
-      "birth": "1984-01-05",
-      "photo": "https://randomuser.me/api/portraits/women/68.jpg",
-      "admin": false,
-      "status": "ON"
+      "uid": "7GW65Xy6ObUMid5ezyKMpzRFSQz1",
+      "displayName": "André Luferat",
+      "email": "andre@luferat.net",
+      "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocKxQS94-RYr_kReF-M-1ZgXwlZBcVaDNhb9ZpQPG0le0G5WAQOD=s96-c",
+      "phoneNumber": null,
+      "createdAt": "2025-09-03T14:02:04.000Z",
+      "lastLoginAt": "2025-09-05T23:08:33.000Z",
+      "id": 2
     }
   ],
   "contacts": []

@@ -5,7 +5,8 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:intl/intl.dart'; // Adicionado para formatação de data
+import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Importa o Firebase Auth
 
 import '../template/config.dart';
 import '../template/myappbar.dart';
@@ -32,6 +33,18 @@ class _ContactsPage extends State<ContactsPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _subjectController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final user = FirebaseAuth.instance.currentUser;
+    // Verifica se há um usuário logado
+    if (user != null) {
+      // Preenche os campos com os dados do usuário, se disponíveis
+      _nameController.text = user.displayName ?? '';
+      _emailController.text = user.email ?? '';
+    }
+  }
 
   @override
   void dispose() {
@@ -180,7 +193,6 @@ class _ContactsPage extends State<ContactsPage> {
       final subject = _subjectController.text;
       final message = _messageController.text;
 
-      // Cria um carimbo de data/hora no formato ISO 8601
       final now = DateTime.now();
       final formattedDate = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(now.toUtc());
 
@@ -189,8 +201,8 @@ class _ContactsPage extends State<ContactsPage> {
         'email': email,
         'subject': subject,
         'message': message,
-        'date': formattedDate, // Adiciona o campo de data
-        'status': 'ON', // Adiciona o campo de status
+        'date': formattedDate,
+        'status': 'ON',
       };
 
       try {
@@ -212,6 +224,12 @@ class _ContactsPage extends State<ContactsPage> {
           _emailController.clear();
           _subjectController.clear();
           _messageController.clear();
+          // Preenche novamente caso o usuário esteja logado
+          final user = FirebaseAuth.instance.currentUser;
+          if (user != null) {
+            _nameController.text = user.displayName ?? '';
+            _emailController.text = user.email ?? '';
+          }
         } else {
           showSnackBar(
             context,

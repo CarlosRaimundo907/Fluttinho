@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import 'config.dart';
 
 class MyDrawer extends StatelessWidget {
@@ -18,16 +19,14 @@ class MyDrawer extends StatelessWidget {
             builder: (context, snapshot) {
               final user = snapshot.data; // O usuário logado ou null
               if (user != null) {
-                // Caso 2: Usuário logado
                 return _buildLoggedInHeader(context, user);
               } else {
-                // Caso 1: Usuário não logado
                 return _buildLoggedOutHeader(context);
               }
             },
           ),
 
-          // ... (O restante do seu código do Drawer permanece o mesmo)
+          // Acesso à página inicial → '/'
           ListTile(
             title: const Text('Início'),
             leading: const Icon(Icons.home),
@@ -36,14 +35,28 @@ class MyDrawer extends StatelessWidget {
               Navigator.pushNamed(context, '/');
             },
           ),
-          ListTile(
-            title: const Text('Novo Item'),
-            leading: const Icon(Icons.add_circle),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, '/new');
+
+          // Adicione o StreamBuilder para mostrar o "Novo Item" condicionalmente
+          StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, snapshot) {
+              final user = snapshot.data;
+              // O if condicional garante que o ListTile seja exibido apenas se o usuário não for nulo
+              if (user != null) {
+                return ListTile(
+                  title: const Text('Novo Item'),
+                  leading: const Icon(Icons.add_circle),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/new');
+                  },
+                );
+              } else {
+                return const SizedBox.shrink(); // Retorna um widget vazio se não estiver logado
+              }
             },
           ),
+
           ListTile(
             title: const Text('Contatos'),
             leading: const Icon(Icons.contact_mail),

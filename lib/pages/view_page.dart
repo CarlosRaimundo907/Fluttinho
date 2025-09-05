@@ -1,3 +1,5 @@
+// pages/view_page.dart
+
 library;
 
 /// Página de visualização de um item
@@ -7,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Importa o Firebase Auth
 
 import '../template/config.dart';
 import '../template/myappbar.dart';
@@ -24,7 +27,6 @@ class ViewPage extends StatefulWidget {
   const ViewPage({super.key, required this.id});
 
   @override
-  // Cria o estado mutável para este widget
   State<ViewPage> createState() => _ViewPageState();
 }
 
@@ -45,7 +47,6 @@ class _ViewPageState extends State<ViewPage> {
   void initState() {
     super.initState();
 
-    // Se o ID estiver ausente, redireciona para a Home
     if (widget.id == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacementNamed('/');
@@ -56,11 +57,7 @@ class _ViewPageState extends State<ViewPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Obtém o ID do item dos argumentos da rota
-    // final itemId = ModalRoute.of(context)?.settings.arguments as String?;
 
-    // Se o ID for nulo (porque a página foi recarregada),
-    // redireciona para a home page
     if (widget.id == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacementNamed('/');
@@ -74,7 +71,6 @@ class _ViewPageState extends State<ViewPage> {
     }
   }
 
-  // Função assíncrona para buscar os dados do item da API
   void _fetchItem(String itemId) async {
     final url = '${Config.endPoint['listOne']}$_itemId';
 
@@ -88,14 +84,13 @@ class _ViewPageState extends State<ViewPage> {
       if (response.statusCode == 200) {
         if (response.data is List && response.data.isNotEmpty) {
           final fetchedItem = response.data[0];
-          // Agora que temos o item, vamos buscar o nome do proprietário
           if (fetchedItem['ownerId'] != null) {
             await _fetchOwnerName(fetchedItem['ownerId'].toString());
           }
 
           setState(() {
             _item = fetchedItem;
-            _isLoading = false; // Carregamento concluído
+            _isLoading = false;
           });
 
           if (kDebugMode) {
@@ -135,14 +130,13 @@ class _ViewPageState extends State<ViewPage> {
     }
   }
 
-  // Nova função para buscar o nome do proprietário
   Future<void> _fetchOwnerName(String ownerId) async {
     final url = '${Config.endPoint['users']}/$ownerId';
     try {
       final response = await _dio.get(url);
       if (response.statusCode == 200 && response.data != null) {
         setState(() {
-          _ownerName = response.data['name'];
+          _ownerName = response.data['displayName'] ?? response.data['name'];
         });
       } else {
         setState(() {
@@ -170,6 +164,8 @@ class _ViewPageState extends State<ViewPage> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final content = _buildPageContent();
+
         if (constraints.maxWidth > 1080) {
           return Row(
             children: [
@@ -177,47 +173,7 @@ class _ViewPageState extends State<ViewPage> {
               Expanded(
                 child: Scaffold(
                   appBar: MyAppBar(title: pageName),
-                  body: Center(
-                    child: _isLoading
-                        ? const CircularProgressIndicator()
-                        : _item != null
-                        ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Passa o nome do proprietário para o widget ItemView
-                        ItemView(item: _item, ownerName: _ownerName),
-                        const SizedBox(height: 24),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.of(context).pushNamed('/edit', arguments: _item['id'].toString()).then((result) {
-                              if (result == true) {
-                                _fetchItem(_item['id'].toString());
-                              }
-                            });
-                          },
-                          icon: const Icon(Icons.edit),
-                          label: const Text('Editar'),
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                            textStyle: const TextStyle(fontSize: 18),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.of(context).pushReplacementNamed('/');
-                          },
-                          icon: const Icon(Icons.arrow_back),
-                          label: const Text('Voltar para a Lista'),
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                            textStyle: const TextStyle(fontSize: 18),
-                          ),
-                        ),
-                      ],
-                    )
-                        : const Text('Item não encontrado.'),
-                  ),
+                  body: Center(child: content),
                 ),
               ),
             ],
@@ -226,50 +182,87 @@ class _ViewPageState extends State<ViewPage> {
           return Scaffold(
             appBar: MyAppBar(title: pageName),
             drawer: const MyDrawer(),
-            body: Center(
-              child: _isLoading
-                  ? const CircularProgressIndicator()
-                  : _item != null
-                  ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Passa o nome do proprietário para o widget ItemView
-                  ItemView(item: _item, ownerName: _ownerName),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed('/edit', arguments: _item['id'].toString()).then((result) {
-                        if (result == true) {
-                          _fetchItem(_item['id'].toString());
-                        }
-                      });
-                    },
-                    icon: const Icon(Icons.edit),
-                    label: const Text('Editar'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      textStyle: const TextStyle(fontSize: 18),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).pushReplacementNamed('/');
-                    },
-                    icon: const Icon(Icons.arrow_back),
-                    label: const Text('Voltar para a Lista'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      textStyle: const TextStyle(fontSize: 18),
-                    ),
-                  ),
-                ],
-              )
-                  : const Text('Item não encontrado.'),
-            ),
+            body: Center(child: content),
           );
         }
       },
+    );
+  }
+
+  Widget _buildPageContent() {
+    if (_isLoading) {
+      return const CircularProgressIndicator();
+    }
+
+    if (_item == null) {
+      return const Text('Item não encontrado.');
+    }
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(32.0),
+      child: Column(
+        children: [
+          ItemView(item: _item, ownerName: _ownerName),
+          const SizedBox(height: 24),
+          // Adiciona a lógica condicional para os botões
+          StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, snapshot) {
+              final user = snapshot.data;
+              final bool canEdit = user != null && user.uid == _item['ownerId'];
+
+              if (canEdit) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context)
+                            .pushNamed('/edit', arguments: _item['id'].toString())
+                            .then((result) {
+                          if (result == true) {
+                            _fetchItem(_item['id'].toString());
+                          }
+                        });
+                      },
+                      icon: const Icon(Icons.edit),
+                      label: const Text('Editar'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        textStyle: const TextStyle(fontSize: 18),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).pushReplacementNamed('/');
+                      },
+                      icon: const Icon(Icons.arrow_back),
+                      label: const Text('Voltar para a Lista'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        textStyle: const TextStyle(fontSize: 18),
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                return ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).pushReplacementNamed('/');
+                  },
+                  icon: const Icon(Icons.arrow_back),
+                  label: const Text('Voltar para a Lista'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    textStyle: const TextStyle(fontSize: 18),
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 }
@@ -277,16 +270,15 @@ class _ViewPageState extends State<ViewPage> {
 // Widget para exibir os detalhes do item
 class ItemView extends StatelessWidget {
   final dynamic item;
-  final String? ownerName; // Novo parâmetro para o nome do proprietário
+  final String? ownerName;
 
   const ItemView({super.key, required this.item, required this.ownerName});
 
-  // Função para mapear chaves de campos para nomes traduzidos
   String _mapFieldName(String key) {
     switch (key) {
       case 'date':
         return 'Cadastrado';
-      case 'ownerId': // Este caso não será mais usado, mas o mantemos para consistência
+      case 'ownerId':
         return 'Proprietário';
       case 'location':
         return 'Localização';
@@ -297,23 +289,20 @@ class ItemView extends StatelessWidget {
     }
   }
 
-  // Função para formatar a data
   String _formatDate(String dateString) {
     try {
       final DateTime date = DateTime.parse(dateString);
-      // Formato 'dd/MM/yyyy às HH:mm'
       return DateFormat('dd/MM/yyyy \'às\' HH:mm').format(date);
     } catch (e) {
       if (kDebugMode) {
         print('Erro ao formatar a data: $e');
       }
-      return dateString; // Retorna a string original em caso de erro
+      return dateString;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Verifica se a photoURL é uma string válida, caso contrário usa uma imagem de fallback.
     final String? photoUrl = item['photoURL'] is String
         ? item['photoURL']
         : null;
@@ -323,7 +312,6 @@ class ItemView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Imagem do item com bordas arredondadas ou fallback
           ClipRRect(
             borderRadius: BorderRadius.circular(10.0),
             child: photoUrl != null
@@ -347,20 +335,17 @@ class ItemView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          // Nome do item
           Text(
             item['name'],
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
           ),
           const SizedBox(height: 8),
-          // Descrição do item
           Text(
             item['description'],
             textAlign: TextAlign.justify,
             style: TextStyle(fontSize: 16, color: Colors.grey[700]),
           ),
           const SizedBox(height: 16),
-          // Exibe o nome do proprietário
           if (ownerName != null)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -372,9 +357,7 @@ class ItemView extends StatelessWidget {
                 ),
               ),
             ),
-          // Outros campos do item em formato de lista
           ...item.keys.map((key) {
-            // Ignora os campos já exibidos e o ownerId, que será exibido separadamente
             if (key == 'id' ||
                 key == 'name' ||
                 key == 'photoURL' ||
@@ -383,7 +366,6 @@ class ItemView extends StatelessWidget {
               return const SizedBox.shrink();
             }
 
-            // Traduz a chave e formata a data se for o campo 'date'
             final String fieldName = _mapFieldName(key);
             final dynamic fieldValue = key == 'date'
                 ? _formatDate(item[key])

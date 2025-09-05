@@ -1,3 +1,5 @@
+// pages/new_page.dart
+
 library;
 
 /// Página de cadastro de um novo item
@@ -9,24 +11,7 @@ import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
 
-// Nota: Para que o seletor de data apareça em português (locale 'pt_BR'),
-// você deve adicionar as dependências 'flutter_localizations'
-// e 'intl' em seu arquivo pubspec.yaml e configurar o MaterialApp em main.dart.
-// Exemplo de main.dart:
-//
-// return MaterialApp(
-//   // ...
-//   localizationsDelegates: [
-//     GlobalMaterialLocalizations.delegate,
-//     GlobalWidgetsLocalizations.delegate,
-//     GlobalCupertinoLocalizations.delegate,
-//   ],
-//   supportedLocales: const [
-//     Locale('pt', 'BR'),
-//     Locale('en', 'US'), // Adicione outros que precisar
-//   ],
-// );
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Importe o Firebase Auth
 
 import '../template/config.dart';
 import '../template/myappbar.dart';
@@ -59,10 +44,7 @@ class _NewPageState extends State<NewPage> {
   final TextEditingController _photoUrlController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
 
-  // Variáveis para o seletor de usuários
-  List<dynamic> _users = [];
-  dynamic _selectedUser;
-  bool _isLoadingUsers = true;
+  // Variável para controlar o estado de salvamento
   bool _isSaving = false;
 
   // Variável para armazenar a data selecionada como um objeto DateTime
@@ -71,34 +53,12 @@ class _NewPageState extends State<NewPage> {
   @override
   void initState() {
     super.initState();
-    _fetchUsers();
     // Preenche a data com a data atual formatada
     _dateController.text =
         DateFormat('dd/MM/yyyy HH:mm:ss').format(_selectedDate);
     // Preenche a photoURL com uma URL aleatória
     _photoUrlController.text =
     'https://picsum.photos/400?random=${Random().nextInt(100)}';
-  }
-
-  // Função para buscar os usuários da API
-  void _fetchUsers() async {
-    try {
-      final response = await _dio.get(Config.endPoint['users']);
-      if (response.statusCode == 200) {
-        setState(() {
-          _users = response.data;
-          _isLoadingUsers = false;
-        });
-      } else {
-        setState(() {
-          _isLoadingUsers = false;
-        });
-      }
-    } on DioException {
-      setState(() {
-        _isLoadingUsers = false;
-      });
-    }
   }
 
   // Função para abrir o seletor de data
@@ -114,18 +74,28 @@ class _NewPageState extends State<NewPage> {
       setState(() {
         _selectedDate = picked;
         // Atualiza o controlador com a nova data selecionada e a hora atual
-        _dateController.text = DateFormat('dd/MM/yyyy HH:mm:ss')
-            .format(_selectedDate);
+        _dateController.text = DateFormat('dd/MM/yyyy HH:mm:ss').format(_selectedDate);
       });
     }
   }
 
   // Função para salvar o novo item
   void _saveItem() async {
-    if (!_formKey.currentState!.validate() || _selectedUser == null) {
+    if (!_formKey.currentState!.validate()) {
       showSnackBar(
         context,
-        'Por favor, preencha todos os campos e selecione um usuário.',
+        'Por favor, preencha todos os campos obrigatórios.',
+        color: Colors.red,
+      );
+      return;
+    }
+
+    // Obtém o UID do usuário logado
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      showSnackBar(
+        context,
+        'Você precisa estar logado para cadastrar um novo item.',
         color: Colors.red,
       );
       return;
@@ -137,7 +107,7 @@ class _NewPageState extends State<NewPage> {
 
     final newItem = {
       'date': DateFormat('yyyy-MM-dd HH:mm:ss').format(_selectedDate),
-      'ownerId': _selectedUser['id'],
+      'ownerId': user.uid, // Atribui o UID do usuário logado
       'name': _nameController.text,
       'description': _descriptionController.text,
       'location': _locationController.text,
@@ -224,6 +194,25 @@ class _NewPageState extends State<NewPage> {
   }
 
   Widget _buildNewItemForm() {
+    // Adiciona uma verificação para garantir que o usuário está logado
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.lock, size: 64, color: Colors.grey),
+            SizedBox(height: 16),
+            Text(
+              'Acesso restrito. Faça login para continuar.',
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Conteúdo do formulário para o usuário logado
     return SingleChildScrollView(
       padding: const EdgeInsets.all(32.0),
       child: Center(
@@ -273,8 +262,8 @@ class _NewPageState extends State<NewPage> {
                 const SizedBox(height: 20.0),
                 TextFormField(
                   controller: _dateController,
-                  readOnly: true, // Impede que o usuário digite
-                  onTap: () => _selectDate(context), // Abre o seletor de data
+                  readOnly: true,
+                  onTap: () => _selectDate(context),
                   decoration: const InputDecoration(
                     labelText: 'Data de Cadastro',
                     border: OutlineInputBorder(),
@@ -287,35 +276,7 @@ class _NewPageState extends State<NewPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 20.0),
-                if (_isLoadingUsers)
-                  const CircularProgressIndicator()
-                else
-                  DropdownButtonFormField<dynamic>(
-                    value: _selectedUser,
-                    decoration: const InputDecoration(
-                      labelText: 'Proprietário (Usuário)',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.person),
-                    ),
-                    items: _users.map<DropdownMenuItem<dynamic>>((user) {
-                      return DropdownMenuItem<dynamic>(
-                        value: user,
-                        child: Text(user['name']),
-                      );
-                    }).toList(),
-                    onChanged: (dynamic? newUser) {
-                      setState(() {
-                        _selectedUser = newUser;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Por favor, selecione um usuário.';
-                      }
-                      return null;
-                    },
-                  ),
+                // O DropdownButtonFormField foi removido daqui
                 const SizedBox(height: 20.0),
                 TextFormField(
                   controller: _locationController,
