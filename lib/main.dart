@@ -15,23 +15,7 @@ class AuthWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const MaterialApp(
-            home: Scaffold(body: Center(child: CircularProgressIndicator())),
-          );
-        }
-
-        if (snapshot.hasData) {
-          // Se o usuário está logado, a rota inicial é a HomePage
-          return MyApp(initialRoute: '/');
-        }
-
-        // Se o usuário não está logado, a rota inicial é a LoginPage
-        return MyApp(initialRoute: '/login');
-      },
-    );
+    // Apenas retorna o MyApp com a rota inicial '/'
+    return MyApp(initialRoute: '/');
   }
 }

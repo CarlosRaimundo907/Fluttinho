@@ -13,11 +13,10 @@ class MyDrawer extends StatelessWidget {
     return Drawer(
       child: Column(
         children: [
-          // Use um StreamBuilder para ouvir as mudanças de autenticação
           StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, snapshot) {
-              final user = snapshot.data; // O usuário logado ou null
+              final user = snapshot.data;
               if (user != null) {
                 return _buildLoggedInHeader(context, user);
               } else {
@@ -25,8 +24,6 @@ class MyDrawer extends StatelessWidget {
               }
             },
           ),
-
-          // Acesso à página inicial → '/'
           ListTile(
             title: const Text('Início'),
             leading: const Icon(Icons.home),
@@ -35,13 +32,10 @@ class MyDrawer extends StatelessWidget {
               Navigator.pushNamed(context, '/');
             },
           ),
-
-          // Adicione o StreamBuilder para mostrar o "Novo Item" condicionalmente
           StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, snapshot) {
               final user = snapshot.data;
-              // O if condicional garante que o ListTile seja exibido apenas se o usuário não for nulo
               if (user != null) {
                 return ListTile(
                   title: const Text('Novo Item'),
@@ -52,11 +46,10 @@ class MyDrawer extends StatelessWidget {
                   },
                 );
               } else {
-                return const SizedBox.shrink(); // Retorna um widget vazio se não estiver logado
+                return const SizedBox.shrink();
               }
             },
           ),
-
           ListTile(
             title: const Text('Contatos'),
             leading: const Icon(Icons.contact_mail),
@@ -99,8 +92,17 @@ class MyDrawer extends StatelessWidget {
     );
   }
 
-  // A função agora recebe o objeto User
   Widget _buildLoggedInHeader(BuildContext context, User user) {
+    final displayName = user.displayName ?? '';
+    final names = displayName.split(' ');
+    String displayUserName;
+
+    if (names.length > 1) {
+      displayUserName = '${names.first} ${names.last}';
+    } else {
+      displayUserName = names.first;
+    }
+
     return DrawerHeader(
       child: InkWell(
         onTap: () {
@@ -112,7 +114,6 @@ class MyDrawer extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 30,
-              // Use a photoURL do usuário
               backgroundImage: user.photoURL != null
                   ? NetworkImage(user.photoURL!)
                   : null,
@@ -121,50 +122,51 @@ class MyDrawer extends StatelessWidget {
                   : null,
             ),
             const SizedBox(width: 16),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  // Use o displayName do usuário
-                  user.displayName ?? 'Usuário',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20.0,
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    displayUserName.isEmpty ? 'Usuário' : displayUserName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0,
+                      overflow: TextOverflow.ellipsis, // Evita estouro de texto
+                    ),
                   ),
-                ),
-                const Text(
-                  'Ver perfil',
-                  style: TextStyle(fontSize: 14.0, color: Colors.blue),
-                ),
-              ],
+                  const Text(
+                    'Ver perfil',
+                    style: TextStyle(fontSize: 14.0, color: Colors.blue),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
     );
   }
-}
 
-// As funções _buildLoggedOutHeader e o restante do código não mudaram.
-Widget _buildLoggedOutHeader(BuildContext context) {
-  return DrawerHeader(
-    child: InkWell(
-      onTap: () {
-        Navigator.pop(context);
-        Navigator.pushNamed(context, '/login');
-      },
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircleAvatar(radius: 30, child: Icon(Icons.person, size: 40)),
-          SizedBox(width: 16),
-          Text(
-            'Login / Entrar',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
-          ),
-        ],
+  Widget _buildLoggedOutHeader(BuildContext context) {
+    return DrawerHeader(
+      child: InkWell(
+        onTap: () {
+          Navigator.pop(context);
+          Navigator.pushNamed(context, '/login');
+        },
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(radius: 30, child: Icon(Icons.person, size: 40)),
+            SizedBox(width: 16),
+            Text(
+              'Login / Entrar',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
